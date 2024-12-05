@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Score Prediction</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Form Column (col-md-8) -->
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="text-center">Predict Final Cricket Score</h1>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="team" class="form-label">Team Name:</label>
+                                <input type="text" class="form-control" id="team" name="team" placeholder="Enter team name" required>
+                                <div class="invalid-feedback">Please enter a team name.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="over" class="form-label">Over (1-10):</label>
+                                <input type="number" class="form-control" id="over" name="over" min="1" max="10" required>
+                                <div class="invalid-feedback">Please enter a valid over number (1-10).</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="score" class="form-label">Score:</label>
+                                <input type="number" class="form-control" id="score" name="score" placeholder="Enter score at the over" required>
+                                <div class="invalid-feedback">Please enter the score.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="wickets" class="form-label">Wickets:</label>
+                                <input type="number" class="form-control" id="wickets" name="wickets" placeholder="Enter wickets fallen" required>
+                                <div class="invalid-feedback">Please enter the number of wickets.</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">Predict</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prediction Result Column (col-md-4) -->
+            <div class="col-md-4">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="text-center">Prediction Result</h4>
+                    </div>
+                    <div class="card-body">
+                        <h2 id="result" class="text-center text-primary"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const form = event.target;
+            // if (!form.checkValidity()) {
+            //     form.classList.add('was-validated');
+            //     return;
+            // }
+
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('result').innerText = `Predicted Final Score: ${data.predicted_score}`;
+        });
+    </script>
+</body>
+</html>

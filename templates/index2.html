@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Score Prediction</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Form Column (col-md-8) -->
+            <div class="col-md-4">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="text-center">Predict Final Cricket Score</h1>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form" class="needs-validation" novalidate>
+                            <table class="table">
+                                <tr>
+                                    <td><label for="batting_team" class="form-label">Bat Team:</label></td>
+                                    <td>
+                                        <input type="text" class="form-control" id="batting_team" name="batting_team" placeholder="Enter batting team" required>
+                                        <div class="invalid-feedback">Please enter a batting team.</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="bowling_team" class="form-label">Bowl Team:</label></td>
+                                    <td>
+                                        <input type="text" class="form-control" id="bowling_team" name="bowling_team" placeholder="Enter bowling team" required>
+                                        <div class="invalid-feedback">Please enter a bowling team.</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="over" class="form-label">Over:</label></td>
+                                    <td>
+                                        <input type="number" class="form-control" id="over" name="over" min="1" max="10" required>
+                                        <div class="invalid-feedback">Please enter a valid over number (1-10).</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="score" class="form-label">Score:</label></td>
+                                    <td>
+                                        <input type="number" class="form-control" id="score" name="score" placeholder="Enter score at the over" required>
+                                        <div class="invalid-feedback">Please enter the score.</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label for="wickets" class="form-label">Wickets:</label></td>
+                                    <td>
+                                        <input type="number" class="form-control" id="wickets" name="wickets" placeholder="Enter wickets fallen" required>
+                                        <div class="invalid-feedback">Please enter the number of wickets.</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="submit" class="btn btn-success w-100">Predict</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prediction Result Column (col-md-4) -->
+            <div class="col-md-4">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="text-center">Prediction Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Scenario</th>
+                                    <th>Predicted Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Based on Batting Team</td>
+                                    <td id="batting-team-score" class="text-center text-primary"></td>
+                                </tr>
+                                <tr>
+                                    <td>Based on Bowling Team</td>
+                                    <td id="bowling-team-score" class="text-center text-primary"></td>
+                                </tr>
+                                <tr>
+                                    <td>Based on Both Teams</td>
+                                    <td id="both-teams-score" class="text-center text-primary"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Update the table with the predicted scores
+            document.getElementById('batting-team-score').innerText = data.predicted_score_batting;
+            document.getElementById('bowling-team-score').innerText = data.predicted_score_bowling;
+            // document.getElementById('both-teams-score').innerText = data.predicted_score_both;
+        });
+    </script>
+</body>
+</html>
