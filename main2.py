@@ -4,10 +4,13 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
+mainteams=['New Zealand','Pakistan','Australia','India','South Africa',
+'England','West Indies','Zimbabwe','Bangladesh','Afghanistan','Sri Lanka','Ireland',
+'IND Women','AUS Women','ENG Women','SA Women','PAK Women','IRE Women','WI Women',]
 app = Flask(__name__)
 
 # Load Data and Train Model
-file_path = 'WODI.csv'
+file_path = 'MODI.csv'
 df = pd.read_csv(file_path)
 
 # Data Preprocessing
