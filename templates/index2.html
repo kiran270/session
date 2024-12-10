@@ -25,22 +25,31 @@
                                 <tr>
                                     <td><label for="batting_team" class="form-label">Bat Team:</label></td>
                                     <td>
-                                        <input type="text" class="form-control" id="batting_team" name="batting_team" placeholder="Enter batting team" required>
-                                        <div class="invalid-feedback">Please enter a batting team.</div>
+                                        <select class="form-control" id="batting_team" name="batting_team">
+                                            {% for team in mainteams %}
+                                              <option value="{{ team }}">{{ team }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td><label for="bowling_team" class="form-label">Bowl Team:</label></td>
                                     <td>
-                                        <input type="text" class="form-control" id="bowling_team" name="bowling_team" placeholder="Enter bowling team" required>
-                                        <div class="invalid-feedback">Please enter a bowling team.</div>
+                                        <select class="form-control" id="bowling_team" name="bowling_team">
+                                            {% for team in mainteams %}
+                                              <option value="{{ team }}">{{ team }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td><label for="format_type" class="form-label">Format:</label></td>
                                     <td>
-                                        <input type="text" class="form-control" id="format_type" name="format_type" required>
-                                        <div class="invalid-feedback">Please format type</div>
+                                        <select class="form-control" id="format_type" name="format_type">
+                                            {% for format in formats %}
+                                              <option value="{{ format }}">{{ format }}</option>
+                                            {% endfor %}
+                                        </select>                                        
                                     </td>
                                 </tr>
                                 <tr>

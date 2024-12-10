@@ -63,7 +63,7 @@ def loadmodels(filename,num_overs):
 # Route for Home Page
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    return render_template("index2.html",mainteams=mainteams,formats=formats)
 
 # Route for Predictions
 @app.route('/predict', methods=['POST'])
@@ -97,7 +97,6 @@ def predict():
 
     # One-hot encode both batting and bowling teams
     for col in X.columns:
-        print(col)
         input_data_both[col] = (
             1 if (col == f'Batting_Team_{batting_team}') and (col == f'Bowling_Team_{bowling_team}') else 0
         )
@@ -120,8 +119,9 @@ def predict():
 
 if __name__ == '__main__':
     loadmodels("MODI.csv",50)
+    loadmodels("WODI.csv",50)
     # loadmodels("WODI.csv",50)
     loadmodels("MT20I.csv",20)
     # loadmodels("WT20I.csv",20)
-    print(models)
+    # print(models)
     app.run(host='0.0.0.0', port=5000, debug=True)
