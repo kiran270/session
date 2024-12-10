@@ -37,6 +37,13 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td><label for="format_type" class="form-label">Format:</label></td>
+                                    <td>
+                                        <input type="text" class="form-control" id="format_type" name="format_type" required>
+                                        <div class="invalid-feedback">Please format type</div>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td><label for="over" class="form-label">Over:</label></td>
                                     <td>
                                         <input type="number" class="form-control" id="over" name="over" min="1" max="10" required>
@@ -121,7 +128,7 @@
             // Update the table with the predicted scores
             document.getElementById('batting-team-score').innerText = data.predicted_score_batting;
             document.getElementById('bowling-team-score').innerText = data.predicted_score_bowling;
-            // document.getElementById('both-teams-score').innerText = data.predicted_score_both;
+            document.getElementById('both-teams-score').innerText = data.predicted_score_both;
         });
     </script>
 </body>
