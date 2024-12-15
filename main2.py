@@ -7,8 +7,9 @@ from sklearn.model_selection import train_test_split
 mainteams=['New Zealand','Pakistan','Australia','India','South Africa',
 'England','West Indies','Zimbabwe','Bangladesh','Afghanistan','Sri Lanka','Ireland',
 'IRE Women','BAN Women','India Women','PAK Women','SRI Women','AUS Women',
-'ENG Women','SA Women','NZ Women']
-formats=['WODI','WT20I','MODI','MT20I']
+'ENG Women','SA Women','NZ Women','Scorchers','Sixers','Hurricanes','Stars','Strikers',
+'Renegades','Thunder','Heat']
+formats=['WODI','WT20I','MODI','MT20I','MBBL']
 app = Flask(__name__)
 models={}
 def loadmodels(filename,num_overs):
@@ -122,6 +123,7 @@ if __name__ == '__main__':
     loadmodels("WODI.csv",50)
     # loadmodels("WODI.csv",50)
     loadmodels("MT20I.csv",20)
+    loadmodels("MBBL.csv",20)
     # loadmodels("WT20I.csv",20)
     # print(models)
     app.run(host='0.0.0.0', port=5000, debug=True)
