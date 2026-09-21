@@ -66,7 +66,8 @@ model.fit(X_train, y_train)
 # Route for Home Page
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    formats = ['T20I', 'ODI', 'T10', 'MBBL', 'MODI', 'WODI']
+    return render_template('index2.html', mainteams=mainteams, formats=formats)
 
 # Route for Predictions
 @app.route('/predict', methods=['POST'])

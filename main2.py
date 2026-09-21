@@ -123,7 +123,7 @@ if __name__ == '__main__':
     loadmodels("WODI.csv",50)
     # loadmodels("WODI.csv",50)
     loadmodels("MT20I.csv",20)
-    loadmodels("MBBL.csv",20)
+    # loadmodels("MBBL.csv",20)
     # loadmodels("WT20I.csv",20)
     # print(models)
     app.run(host='0.0.0.0', port=5000, debug=True)
