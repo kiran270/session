@@ -228,50 +228,235 @@ class ResultCard extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
       ),
-      builder: (context) => SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height * 0.72,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Closest historical innings',
-                  style: TextStyle(
-                    color: AppColors.textDark,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Comparable score, over, wickets and team context from the training data.',
-                  style: TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 11,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: prediction.similarMatches.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 9),
-                    itemBuilder: (_, index) => _ComparableMatchTile(
-                      match: prediction.similarMatches[index],
+      builder: (_) => _ComparableMatchesSheet(
+        matches: prediction.similarMatches,
+      ),
+    );
+  }
+}
+
+class _ComparableMatchesSheet extends StatefulWidget {
+  final List<ComparableMatch> matches;
+
+  const _ComparableMatchesSheet({required this.matches});
+
+  @override
+  State<_ComparableMatchesSheet> createState() =>
+      _ComparableMatchesSheetState();
+}
+
+class _ComparableMatchesSheetState extends State<_ComparableMatchesSheet> {
+  String _team = '';
+  String _ground = '';
+
+  List<String> get _teams => widget.matches
+      .expand((match) => [match.battingTeam, match.bowlingTeam])
+      .where((team) => team.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+
+  List<String> get _grounds => widget.matches
+      .map((match) => match.venue)
+      .where((ground) => ground.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
+
+  List<ComparableMatch> get _filtered => widget.matches.where((match) {
+        final teamMatches = _team.isEmpty ||
+            match.battingTeam == _team ||
+            match.bowlingTeam == _team;
+        final groundMatches = _ground.isEmpty || match.venue == _ground;
+        return teamMatches && groundMatches;
+      }).toList();
+
+  @override
+  Widget build(BuildContext context) {
+    final matches = _filtered;
+    final filterActive = _team.isNotEmpty || _ground.isNotEmpty;
+
+    return SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.78,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Historical match explorer',
+                      style: TextStyle(
+                        color: AppColors.textDark,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
+                  if (filterActive)
+                    TextButton.icon(
+                      onPressed: () => setState(() {
+                        _team = '';
+                        _ground = '';
+                      }),
+                      icon: const Icon(Icons.restart_alt_rounded, size: 16),
+                      label: const Text('RESET'),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '${matches.length} of ${widget.matches.length} comparable innings',
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 11,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _FilterDropdown(
+                      label: 'TEAM',
+                      icon: Icons.groups_2_rounded,
+                      value: _team,
+                      allLabel: 'All teams',
+                      options: _teams,
+                      onChanged: (value) => setState(() => _team = value),
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: _FilterDropdown(
+                      label: 'GROUND',
+                      icon: Icons.stadium_rounded,
+                      value: _ground,
+                      allLabel:
+                          _grounds.isEmpty ? 'No ground data' : 'All grounds',
+                      options: _grounds,
+                      enabled: _grounds.isNotEmpty,
+                      onChanged: (value) => setState(() => _ground = value),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 13),
+              Flexible(
+                child: matches.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 34),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.filter_alt_off_rounded,
+                                color: AppColors.textMuted,
+                                size: 30,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'No innings match these filters',
+                                style: TextStyle(color: AppColors.textMuted),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: matches.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 9),
+                        itemBuilder: (_, index) =>
+                            _ComparableMatchTile(match: matches[index]),
+                      ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FilterDropdown extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final String value;
+  final String allLabel;
+  final List<String> options;
+  final ValueChanged<String> onChanged;
+  final bool enabled;
+
+  const _FilterDropdown({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.allLabel,
+    required this.options,
+    required this.onChanged,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 5),
+        DropdownButtonFormField<String>(
+          value: value,
+          isExpanded: true,
+          dropdownColor: AppColors.surfaceHigh,
+          icon: const Icon(Icons.expand_more_rounded, size: 18),
+          style: const TextStyle(
+            color: AppColors.textDark,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+          decoration: InputDecoration(
+            enabled: enabled,
+            prefixIconConstraints: const BoxConstraints(minWidth: 36),
+            prefixIcon: Icon(
+              icon,
+              color: enabled ? AppColors.primary : AppColors.textMuted,
+              size: 16,
+            ),
+          ),
+          items: [
+            DropdownMenuItem(value: '', child: Text(allLabel)),
+            ...options.map(
+              (option) => DropdownMenuItem(
+                value: option,
+                child: Text(
+                  option,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+          onChanged: enabled
+              ? (selected) => onChanged(selected ?? '')
+              : null,
+        ),
+      ],
     );
   }
 }
